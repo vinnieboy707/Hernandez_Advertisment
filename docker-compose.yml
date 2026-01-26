@@ -55,7 +55,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: npm run init-db
+    command: sh -c "npm run init-db && npm run seed"
     restart: "no"
 
 volumes:
