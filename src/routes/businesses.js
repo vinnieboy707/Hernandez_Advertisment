@@ -149,7 +149,7 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Whitelist of allowed field names to prevent SQL injection
+    // Whitelist of allowed field names to prevent unauthorized field updates
     const allowedFields = [
       'business_name',
       'sos_registration_number',

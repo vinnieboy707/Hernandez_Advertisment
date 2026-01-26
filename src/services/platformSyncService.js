@@ -45,7 +45,7 @@ class PlatformSyncService {
   }
 
   /**
-   * Sync business to all platforms (in parallel)
+   * Sync business to all platforms (in parallel with partial success)
    * @param {Object} businessData - Business information
    * @returns {Promise<Array>} Results from all platforms
    */
@@ -55,7 +55,24 @@ class PlatformSyncService {
       this.syncToPlatform(platform, businessData)
     );
 
-    return await Promise.all(syncPromises);
+    // Use allSettled to allow partial success
+    const settledResults = await Promise.allSettled(syncPromises);
+
+    return settledResults.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+
+      const reason = result.reason || {};
+      const platformName = platforms[index] || 'unknown';
+
+      return {
+        platform: platformName,
+        platformBusinessId: null,
+        success: false,
+        error: reason && reason.message ? reason.message : String(reason)
+      };
+    });
   }
 
   /**
