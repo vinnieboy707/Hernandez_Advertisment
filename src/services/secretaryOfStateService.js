@@ -50,6 +50,7 @@ class SecretaryOfStateService {
       // Validate that the business name matches
       const isValid = businessData && 
                      businessData.status === 'ACTIVE' &&
+                     businessData.name &&
                      this.normalizeBusinessName(businessData.name) === this.normalizeBusinessName(businessName);
 
       return {

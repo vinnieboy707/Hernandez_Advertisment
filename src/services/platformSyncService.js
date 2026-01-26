@@ -110,6 +110,8 @@ class GoogleBusinessSync {
         specialHours: this.formatHolidays(businessData.holidays)
       };
 
+      // Note: In production, use OAuth 2.0 service account authentication
+      // This is a simplified example. See Google Business Profile API docs
       const response = await axios.post(
         `${this.baseUrl}/accounts/${this.accountId}/locations`,
         location,

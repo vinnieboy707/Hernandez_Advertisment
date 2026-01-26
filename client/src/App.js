@@ -329,7 +329,7 @@ function App() {
                       <div className="description">{pkg.description}</div>
                       <div className="details">
                         <div>📅 Duration: {pkg.duration_days} days</div>
-                        <div>📊 Reach: ~{pkg.estimated_reach?.toLocaleString()} listeners</div>
+                        <div>📊 Reach: ~{(pkg.estimated_reach || 0).toLocaleString()} listeners</div>
                         {pkg.spots_per_day && <div>🎯 {pkg.spots_per_day} spots/day</div>}
                         {pkg.spots_per_week && <div>🎯 {pkg.spots_per_week} spots/week</div>}
                       </div>
@@ -357,9 +357,9 @@ function App() {
                       <div className="description">{pkg.description}</div>
                       <div className="details">
                         <div>📅 Duration: {pkg.duration_days} days</div>
-                        {pkg.estimated_impressions && <div>👁️ ~{pkg.estimated_impressions?.toLocaleString()} impressions</div>}
-                        {pkg.estimated_clicks && <div>🖱️ ~{pkg.estimated_clicks?.toLocaleString()} clicks</div>}
-                        {pkg.estimated_views && <div>📺 ~{pkg.estimated_views?.toLocaleString()} views</div>}
+                        {pkg.estimated_impressions && <div>👁️ ~{(pkg.estimated_impressions || 0).toLocaleString()} impressions</div>}
+                        {pkg.estimated_clicks && <div>🖱️ ~{(pkg.estimated_clicks || 0).toLocaleString()} clicks</div>}
+                        {pkg.estimated_views && <div>📺 ~{(pkg.estimated_views || 0).toLocaleString()} views</div>}
                       </div>
                       <button className="btn">Select Package</button>
                     </div>
@@ -385,8 +385,8 @@ function App() {
                       <div className="description">{pkg.description}</div>
                       <div className="details">
                         <div>📅 Duration: {pkg.duration_days} days</div>
-                        {pkg.circulation && <div>📮 Circulation: {pkg.circulation?.toLocaleString()}</div>}
-                        {pkg.mail_count && <div>✉️ Mail count: {pkg.mail_count?.toLocaleString()}</div>}
+                        {pkg.circulation && <div>📮 Circulation: {(pkg.circulation || 0).toLocaleString()}</div>}
+                        {pkg.mail_count && <div>✉️ Mail count: {(pkg.mail_count || 0).toLocaleString()}</div>}
                       </div>
                       <button className="btn">Select Package</button>
                     </div>

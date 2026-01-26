@@ -39,10 +39,10 @@ if [ ! -f .env ]; then
     # Update .env with generated password
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
-        sed -i '' "s/change_this_password/$DB_PASSWORD/g" .env
+        sed -i '' "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env
     else
         # Linux
-        sed -i "s/change_this_password/$DB_PASSWORD/g" .env
+        sed -i "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env
     fi
     
     echo "✅ Created .env file with generated database password"

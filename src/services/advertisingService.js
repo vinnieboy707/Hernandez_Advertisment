@@ -211,7 +211,7 @@ class AdvertisingService {
     );
 
     if (packageResult.rows.length === 0) {
-      throw new Error('Package not found');
+      throw new Error(`Package not found with ID: ${packageId}`);
     }
 
     const durationDays = packageResult.rows[0].duration_days;

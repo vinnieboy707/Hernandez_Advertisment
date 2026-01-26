@@ -265,11 +265,10 @@ router.post('/:id/sync', async (req, res) => {
     // Sync to platforms
     let syncResults;
     if (platforms && Array.isArray(platforms)) {
-      syncResults = [];
-      for (const platform of platforms) {
-        const result = await platformSync.syncToPlatform(platform, businessData);
-        syncResults.push(result);
-      }
+      // Parallel sync to specific platforms
+      syncResults = await Promise.all(
+        platforms.map(platform => platformSync.syncToPlatform(platform, businessData))
+      );
     } else {
       syncResults = await platformSync.syncToAllPlatforms(businessData);
     }
