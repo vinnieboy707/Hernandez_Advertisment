@@ -40,34 +40,53 @@ echo "=================================="
 echo ""
 
 # Check if services are running
-if docker-compose ps 2>/dev/null | grep -q "Up"; then
-    echo "Docker Services:"
-    docker-compose ps
-    echo ""
-    
-    # Check API health
-    echo "Checking API health..."
-    if curl -s http://localhost:3000/health > /dev/null 2>&1; then
-        echo "✅ API is responding"
-        HEALTH=$(curl -s http://localhost:3000/health)
-        echo "   $HEALTH"
-    else
-        echo "❌ API is not responding on port 3000"
-    fi
-    
-    echo ""
-    
-    # Check database
-    echo "Checking database..."
-    if docker-compose exec -T db pg_isready -U hernandez_user > /dev/null 2>&1; then
-        echo "✅ Database is ready"
-    else
-        echo "❌ Database is not ready"
-    fi
-    
+COMPOSE_FILE="docker-compose.yml"
+EXPECTED_SERVICES=("db" "api")
+
+if ! command -v docker-compose > /dev/null 2>&1; then
+    echo "⚠️  Docker Compose is not available, skipping service status checks"
+elif [ ! -f "$COMPOSE_FILE" ]; then
+    echo "⚠️  $COMPOSE_FILE not found, skipping service status checks"
 else
-    echo "⚠️  No Docker services are running"
-    echo "   Run 'docker-compose up -d' to start services"
+    # Validate expected services exist in docker-compose.yml
+    MISSING_SERVICES=()
+    for SERVICE in "${EXPECTED_SERVICES[@]}"; do
+        if ! docker-compose -f "$COMPOSE_FILE" config --services 2>/dev/null | grep -qx "$SERVICE"; then
+            MISSING_SERVICES+=("$SERVICE")
+        fi
+    done
+
+    if [ "${#MISSING_SERVICES[@]}" -ne 0 ]; then
+        echo "⚠️  Expected Docker services not defined in $COMPOSE_FILE: ${MISSING_SERVICES[*]}"
+        echo "   Update $COMPOSE_FILE or adjust the expected services in status.sh."
+    elif docker-compose -f "$COMPOSE_FILE" ps 2>/dev/null | grep -q "Up"; then
+        echo "Docker Services:"
+        docker-compose -f "$COMPOSE_FILE" ps
+        echo ""
+        
+        # Check API health
+        echo "Checking API health..."
+        if curl -s http://localhost:3000/health > /dev/null 2>&1; then
+            echo "✅ API is responding"
+            HEALTH=$(curl -s http://localhost:3000/health)
+            echo "   $HEALTH"
+        else
+            echo "❌ API is not responding on port 3000"
+        fi
+        
+        echo ""
+        
+        # Check database
+        echo "Checking database..."
+        if docker-compose -f "$COMPOSE_FILE" exec -T db pg_isready -U hernandez_user > /dev/null 2>&1; then
+            echo "✅ Database is ready"
+        else
+            echo "❌ Database is not ready"
+        fi
+    else
+        echo "⚠️  No Docker services are running"
+        echo "   Run 'docker-compose up -d' to start services"
+    fi
 fi
 
 echo ""

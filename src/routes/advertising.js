@@ -58,6 +58,32 @@ router.get('/print', async (req, res) => {
 });
 
 /**
+ * GET /api/advertising/events - Get event and fair advertising packages
+ */
+router.get('/events', async (req, res) => {
+  try {
+    const eventPackages = await advertisingService.getEventAdvertisingPackages();
+    res.json(eventPackages);
+  } catch (error) {
+    console.error('Error fetching event packages:', error);
+    res.status(500).json({ error: 'Failed to fetch event packages' });
+  }
+});
+
+/**
+ * GET /api/advertising/website - Get website and digital presence packages
+ */
+router.get('/website', async (req, res) => {
+  try {
+    const websitePackages = await advertisingService.getWebsitePackages();
+    res.json(websitePackages);
+  } catch (error) {
+    console.error('Error fetching website packages:', error);
+    res.status(500).json({ error: 'Failed to fetch website packages' });
+  }
+});
+
+/**
  * GET /api/advertising/all - Get all advertising options
  */
 router.get('/all', async (req, res) => {

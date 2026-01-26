@@ -23,15 +23,26 @@ async function seedData() {
       ['Bundle - 3 Month Campaign', 'radio', 'Discounted 3-month campaign with morning and afternoon spots', 2400, 90, '{"spots_per_day": 3, "estimated_reach": 150000}', 'Local Radio Network', 'contact@localradio.com']
     ];
 
+    let insertedCount = 0;
     for (const pkg of radioPackages) {
-      await client.query(
-        `INSERT INTO advertising_packages 
-         (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT DO NOTHING`,
-        pkg
-      );
+      try {
+        const result = await client.query(
+          `INSERT INTO advertising_packages 
+           (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           ON CONFLICT DO NOTHING
+           RETURNING id`,
+          pkg
+        );
+        if (result.rows.length > 0) {
+          insertedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to insert radio package "${pkg[0]}":`, error.message);
+        throw error;
+      }
     }
+    console.log(`✅ Added ${insertedCount} radio packages (${radioPackages.length - insertedCount} already existed)`);
 
     // Digital packages
     const digitalPackages = [
@@ -41,15 +52,26 @@ async function seedData() {
       ['Video Advertising', 'digital', 'YouTube and streaming platform video ads', 600, 30, '{"estimated_views": 50000}', 'Online Advertising Network', 'digital@oabn.com']
     ];
 
+    insertedCount = 0;
     for (const pkg of digitalPackages) {
-      await client.query(
-        `INSERT INTO advertising_packages 
-         (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT DO NOTHING`,
-        pkg
-      );
+      try {
+        const result = await client.query(
+          `INSERT INTO advertising_packages 
+           (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           ON CONFLICT DO NOTHING
+           RETURNING id`,
+          pkg
+        );
+        if (result.rows.length > 0) {
+          insertedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to insert digital package "${pkg[0]}":`, error.message);
+        throw error;
+      }
     }
+    console.log(`✅ Added ${insertedCount} digital packages (${digitalPackages.length - insertedCount} already existed)`);
 
     // Print packages
     const printPackages = [
@@ -59,17 +81,26 @@ async function seedData() {
       ['Direct Mail Campaign', 'print', 'Postcard or flyer mailed to local addresses', 800, 1, '{"mail_count": 10000}', 'Local Print Media', 'print@localmedia.com']
     ];
 
+    insertedCount = 0;
     for (const pkg of printPackages) {
-      await client.query(
-        `INSERT INTO advertising_packages 
-         (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT DO NOTHING`,
-        pkg
-      );
+      try {
+        const result = await client.query(
+          `INSERT INTO advertising_packages 
+           (package_name, package_type, description, price, duration_days, features, provider_name, provider_contact)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           ON CONFLICT DO NOTHING
+           RETURNING id`,
+          pkg
+        );
+        if (result.rows.length > 0) {
+          insertedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to insert print package "${pkg[0]}":`, error.message);
+        throw error;
+      }
     }
-
-    console.log('✅ Added advertising packages');
+    console.log(`✅ Added ${insertedCount} print packages (${printPackages.length - insertedCount} already existed)`);
 
     // Insert sample businesses (optional)
     console.log('Adding sample businesses...');
@@ -80,17 +111,26 @@ async function seedData() {
       ['Demo Services LLC', 'C1122334', 'hello@demoservices.com', '(555) 456-7890', '789 Pine St', 'Los Angeles', 'CA', '90003', 'Services', false]
     ];
 
+    insertedCount = 0;
     for (const business of sampleBusinesses) {
-      await client.query(
-        `INSERT INTO businesses 
-         (business_name, sos_registration_number, contact_email, contact_phone, address, city, state, zip_code, business_type, validated)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-         ON CONFLICT (sos_registration_number) DO NOTHING`,
-        business
-      );
+      try {
+        const result = await client.query(
+          `INSERT INTO businesses 
+           (business_name, sos_registration_number, contact_email, contact_phone, address, city, state, zip_code, business_type, validated)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+           ON CONFLICT (sos_registration_number) DO NOTHING
+           RETURNING id`,
+          business
+        );
+        if (result.rows.length > 0) {
+          insertedCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to insert business "${business[0]}":`, error.message);
+        throw error;
+      }
     }
-
-    console.log('✅ Added sample businesses');
+    console.log(`✅ Added ${insertedCount} sample businesses (${sampleBusinesses.length - insertedCount} already existed)`);
 
     await client.query('COMMIT');
     console.log('✅ Sample data seeded successfully!');

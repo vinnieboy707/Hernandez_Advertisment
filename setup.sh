@@ -39,10 +39,26 @@ if [ ! -f .env ]; then
     # Update .env with generated password
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
-        sed -i '' "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env
+        if ! sed -i '' "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env; then
+            echo "❌ Failed to update DB_PASSWORD in .env using sed (macOS)."
+            echo "   Please open .env and set DB_PASSWORD manually."
+            exit 1
+        fi
     else
         # Linux
-        sed -i "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env
+        if ! sed -i "s/\${DB_PASSWORD:-change_this_password}/$DB_PASSWORD/g" .env; then
+            echo "❌ Failed to update DB_PASSWORD in .env using sed (Linux)."
+            echo "   Please open .env and set DB_PASSWORD manually."
+            exit 1
+        fi
+    fi
+    
+    # Verify that the placeholder was actually replaced
+    if grep -q "\${DB_PASSWORD:-change_this_password}" .env; then
+        echo "❌ The DB_PASSWORD placeholder is still present in .env."
+        echo "   This likely means the expected pattern changed in .env.example."
+        echo "   Please edit .env and set DB_PASSWORD to a secure value manually."
+        exit 1
     fi
     
     echo "✅ Created .env file with generated database password"

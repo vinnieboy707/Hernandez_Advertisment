@@ -2,12 +2,16 @@ version: '3.8'
 
 services:
   # PostgreSQL Database
+  # SECURITY NOTE: The default password 'change_this_password' is weak and should be
+  # changed before deployment. Use the setup.sh script which generates a random password,
+  # or set DB_PASSWORD in your .env file to a strong password.
   db:
     image: postgres:15-alpine
     container_name: hernandez_ads_db
     environment:
       POSTGRES_DB: hernandez_ads
       POSTGRES_USER: hernandez_user
+      # SECURITY WARNING: Change this password! Use setup.sh or set DB_PASSWORD in .env
       POSTGRES_PASSWORD: ${DB_PASSWORD:-change_this_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -20,10 +24,13 @@ services:
       retries: 5
 
   # API Server
+  # SECURITY NOTE: Database credentials are passed via environment variable.
+  # For production deployments, consider using Docker secrets or a secure vault.
   api:
     build: .
     container_name: hernandez_ads_api
     environment:
+      # SECURITY WARNING: Database password is visible in logs if not properly secured
       DATABASE_URL: postgresql://hernandez_user:${DB_PASSWORD:-change_this_password}@db:5432/hernandez_ads
       PORT: 3000
       NODE_ENV: production

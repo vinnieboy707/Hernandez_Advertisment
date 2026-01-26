@@ -1,4 +1,3 @@
-const axios = require('axios');
 require('dotenv').config();
 
 /**
@@ -25,10 +24,12 @@ class AdvertisingService {
 
   /**
    * Get radio station advertising options
+   * NOTE: These are example packages with realistic pricing. In production,
+   * these should be fetched from actual radio station APIs or a CMS.
    * @returns {Promise<Array>} List of radio stations with packages
    */
   async getRadioStationPackages() {
-    // Radio advertising packages with real station data
+    // Example advertising packages with realistic pricing
     const radioPackages = [
       {
         package_type: 'radio',
@@ -83,6 +84,7 @@ class AdvertisingService {
 
   /**
    * Get digital advertising packages
+   * NOTE: Example packages. Replace with actual API integration in production.
    * @returns {Promise<Array>} Digital advertising options
    */
   async getDigitalAdvertisingPackages() {
@@ -126,6 +128,7 @@ class AdvertisingService {
 
   /**
    * Get print advertising packages
+   * NOTE: Example packages. Replace with actual API integration in production.
    * @returns {Promise<Array>} Print advertising options
    */
   async getPrintAdvertisingPackages() {
@@ -168,6 +171,115 @@ class AdvertisingService {
   }
 
   /**
+   * Get event and fair advertising packages
+   * NOTE: Example packages. Replace with actual API integration in production.
+   * @returns {Promise<Array>} Event and fair advertising options
+   */
+  async getEventAdvertisingPackages() {
+    return [
+      {
+        package_type: 'event',
+        provider_name: 'Local Events & Fairgrounds',
+        packages: [
+          {
+            name: 'County Fair Booth - Standard',
+            description: 'Standard 10x10 booth at county fair with basic setup',
+            price: 1200,
+            duration_days: 7,
+            estimated_attendance: 50000
+          },
+          {
+            name: 'County Fair Booth - Premium',
+            description: 'Premium 20x20 booth with electricity and corner location',
+            price: 2500,
+            duration_days: 7,
+            estimated_attendance: 50000
+          },
+          {
+            name: 'Racetrack Sponsorship - Banner',
+            description: 'Banner placement at local racetrack for entire season',
+            price: 3000,
+            duration_days: 180,
+            estimated_reach: 75000
+          },
+          {
+            name: 'Racetrack Sponsorship - Title',
+            description: 'Title sponsorship for specific race event with branding',
+            price: 5000,
+            duration_days: 1,
+            estimated_reach: 15000
+          },
+          {
+            name: 'Multi-Fair Package',
+            description: 'Booth at 3 regional fairs with setup included',
+            price: 3500,
+            duration_days: 30,
+            estimated_attendance: 125000
+          },
+          {
+            name: 'Festival Vendor Booth',
+            description: 'Booth space at local festivals and community events',
+            price: 800,
+            duration_days: 3,
+            estimated_attendance: 20000
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Get website and digital presence packages
+   * NOTE: Example packages. Replace with actual API integration in production.
+   * @returns {Promise<Array>} Website service packages
+   */
+  async getWebsitePackages() {
+    return [
+      {
+        package_type: 'website',
+        provider_name: 'Digital Presence Services',
+        packages: [
+          {
+            name: 'Business Info Consistency Check',
+            description: 'Verify and correct contact info, hours, and business details across all platforms',
+            price: 199,
+            duration_days: 30,
+            includes: ['Contact verification', 'Hours validation', 'Multi-platform sync', 'Monthly updates']
+          },
+          {
+            name: 'Basic Website Package',
+            description: 'Simple 5-page website with contact form and business information',
+            price: 1500,
+            duration_days: 365,
+            includes: ['5 pages', 'Mobile responsive', 'Contact form', 'Free hosting 1 year', 'Basic SEO']
+          },
+          {
+            name: 'Advanced Website Package',
+            description: 'Professional website with e-commerce, booking system, and custom features',
+            price: 4500,
+            duration_days: 365,
+            includes: ['10+ pages', 'E-commerce/Booking', 'Custom design', 'Free hosting 1 year', 'Advanced SEO', 'Analytics']
+          },
+          {
+            name: 'Website Update Service',
+            description: 'Update existing website with new content, features, and modern design',
+            price: 2000,
+            duration_days: 30,
+            includes: ['Content updates', 'Design refresh', 'Mobile optimization', 'Performance tuning', 'SEO improvements']
+          },
+          {
+            name: 'Complete Digital Presence',
+            description: 'Website + verified listings + social media + monthly management',
+            price: 599,
+            duration_days: 30,
+            includes: ['Website maintenance', 'Multi-platform management', 'Photo updates on Google Maps', 'Social media posts', 'Review monitoring']
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
    * Get all advertising options consolidated
    * @returns {Promise<Object>} All advertising packages organized by type
    */
@@ -175,19 +287,25 @@ class AdvertisingService {
     const radio = await this.getRadioStationPackages();
     const digital = await this.getDigitalAdvertisingPackages();
     const print = await this.getPrintAdvertisingPackages();
+    const events = await this.getEventAdvertisingPackages();
+    const website = await this.getWebsitePackages();
 
     return {
       radio: radio,
       digital: digital,
       print: print,
+      events: events,
+      website: website,
       summary: {
         total_packages: radio[0].packages.length + 
                        digital[0].packages.length + 
-                       print[0].packages.length,
-        types_available: ['radio', 'digital', 'print'],
+                       print[0].packages.length +
+                       events[0].packages.length +
+                       website[0].packages.length,
+        types_available: ['radio', 'digital', 'print', 'events', 'website'],
         price_range: {
-          min: 300,
-          max: 2400
+          min: 199,
+          max: 5000
         }
       }
     };

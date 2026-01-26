@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = '/api';
+// Configurable API URL - can be overridden via environment variable
+const API_URL = process.env.REACT_APP_API_URL || '/api';
+
+// Configure axios defaults and error handling
+axios.defaults.timeout = 30000; // 30 second timeout
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (!error.response) {
+      // Network error
+      return Promise.reject(new Error('Network error: Unable to connect to the server'));
+    }
+    return Promise.reject(error);
+  }
+);
 
 function App() {
   const [currentView, setCurrentView] = useState('home');

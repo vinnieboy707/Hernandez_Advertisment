@@ -149,16 +149,32 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
+    // Whitelist of allowed field names to prevent SQL injection
+    const allowedFields = [
+      'business_name',
+      'sos_registration_number',
+      'contact_email',
+      'contact_phone',
+      'address',
+      'city',
+      'state',
+      'zip_code',
+      'business_type',
+      'validated'
+    ];
+
     const fields = [];
     const values = [];
     let paramCount = 1;
 
-    // Build dynamic update query
+    // Build dynamic update query with validated field names
     for (const [key, value] of Object.entries(updates)) {
-      if (key !== 'id') {
+      if (key !== 'id' && allowedFields.includes(key)) {
         fields.push(`${key} = $${paramCount}`);
         values.push(value);
         paramCount++;
+      } else if (key !== 'id') {
+        return res.status(400).json({ error: `Invalid field: ${key}` });
       }
     }
 
@@ -262,15 +278,52 @@ router.post('/:id/sync', async (req, res) => {
       holidays: holidaysResult.rows
     };
 
-    // Sync to platforms
+    // Sync to platforms (allow partial success)
     let syncResults;
     if (platforms && Array.isArray(platforms)) {
-      // Parallel sync to specific platforms
-      syncResults = await Promise.all(
+      // Parallel sync to specific platforms, allowing partial success
+      const settledResults = await Promise.allSettled(
         platforms.map(platform => platformSync.syncToPlatform(platform, businessData))
       );
+
+      // Normalize settled results into consistent structure
+      syncResults = settledResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+
+        const reason = result.reason || {};
+        const platformName = platforms[index] || 'unknown';
+
+        return {
+          platform: platformName,
+          platformBusinessId: null,
+          success: false,
+          error: reason && reason.message ? reason.message : String(reason)
+        };
+      });
     } else {
-      syncResults = await platformSync.syncToAllPlatforms(businessData);
+      // Sync to all platforms with partial success support
+      const allPlatforms = ['google', 'yellowpages'];
+      const settledResults = await Promise.allSettled(
+        allPlatforms.map(platform => platformSync.syncToPlatform(platform, businessData))
+      );
+
+      syncResults = settledResults.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+
+        const reason = result.reason || {};
+        const platformName = allPlatforms[index] || 'unknown';
+
+        return {
+          platform: platformName,
+          platformBusinessId: null,
+          success: false,
+          error: reason && reason.message ? reason.message : String(reason)
+        };
+      });
     }
 
     // Update platform_sync table

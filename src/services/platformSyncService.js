@@ -45,19 +45,17 @@ class PlatformSyncService {
   }
 
   /**
-   * Sync business to all platforms
+   * Sync business to all platforms (in parallel)
    * @param {Object} businessData - Business information
    * @returns {Promise<Array>} Results from all platforms
    */
   async syncToAllPlatforms(businessData) {
-    const results = [];
-    
-    for (const platform of Object.keys(this.platforms)) {
-      const result = await this.syncToPlatform(platform, businessData);
-      results.push(result);
-    }
+    const platforms = Object.keys(this.platforms);
+    const syncPromises = platforms.map((platform) =>
+      this.syncToPlatform(platform, businessData)
+    );
 
-    return results;
+    return await Promise.all(syncPromises);
   }
 
   /**
@@ -185,11 +183,15 @@ class GoogleBusinessSync {
 
 /**
  * Yellow Pages sync service
+ * NOTE: This is an example integration. The Yellow Pages API endpoint shown here
+ * is a placeholder. In production, configure YELLOWPAGES_API_BASE_URL environment
+ * variable to point to the actual Yellow Pages API or an internal proxy service.
  */
 class YellowPagesSync {
   constructor() {
     this.apiKey = process.env.YELLOWPAGES_API_KEY;
-    this.baseUrl = 'https://api.yellowpages.com/v1';
+    // Example placeholder base URL; override via environment for real integration
+    this.baseUrl = process.env.YELLOWPAGES_API_BASE_URL || 'https://api.yellowpages.com/v1';
   }
 
   async sync(businessData) {
