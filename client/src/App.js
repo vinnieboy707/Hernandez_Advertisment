@@ -21,6 +21,9 @@ function App() {
   const [currentView, setCurrentView] = useState('home');
   const [businesses, setBusinesses] = useState([]);
   const [advertisingOptions, setAdvertisingOptions] = useState(null);
+  const [facebookPackages, setFacebookPackages] = useState([]);
+  const [adsensePackages, setAdsensePackages] = useState([]);
+  const [combinedPackages, setCombinedPackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -43,6 +46,12 @@ function App() {
       fetchBusinesses();
     } else if (currentView === 'advertising') {
       fetchAdvertisingOptions();
+    } else if (currentView === 'facebook') {
+      fetchFacebookPackages();
+    } else if (currentView === 'adsense') {
+      fetchAdSensePackages();
+    } else if (currentView === 'combined') {
+      fetchCombinedPackages();
     }
   }, [currentView]);
 
@@ -67,6 +76,45 @@ function App() {
       setAdvertisingOptions(response.data);
     } catch (err) {
       setError('Failed to fetch advertising options: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFacebookPackages = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/facebook/packages`);
+      setFacebookPackages(response.data);
+    } catch (err) {
+      setError('Failed to fetch Facebook packages: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAdSensePackages = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/google-adsense/packages`);
+      setAdsensePackages(response.data);
+    } catch (err) {
+      setError('Failed to fetch AdSense packages: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCombinedPackages = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/google-adsense/combined-packages`);
+      setCombinedPackages(response.data);
+    } catch (err) {
+      setError('Failed to fetch combined packages: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -137,7 +185,9 @@ function App() {
           <li>✅ <strong>Secretary of State Integration:</strong> Automatically validate business registration and contact information</li>
           <li>✅ <strong>Multi-Platform Sync:</strong> Sync business information across Google Business Profile, Yellow Pages, and more</li>
           <li>✅ <strong>Business Hours Management:</strong> Set and manage open hours and scheduled holidays</li>
-          <li>✅ <strong>Advertising Packages:</strong> Access radio stations, digital, and print advertising options</li>
+          <li>✅ <strong>Facebook Marketing:</strong> Create pages and run targeted ad campaigns with full demographic/geographic control</li>
+          <li>✅ <strong>Google AdSense:</strong> Setup and manage AdSense for website monetization</li>
+          <li>✅ <strong>Traditional Advertising:</strong> Radio, digital, print, events, and website packages</li>
           <li>✅ <strong>Real-Time Data:</strong> No mock data - all information is real and validated</li>
           <li>✅ <strong>Easy Deployment:</strong> Deploy with Docker in minutes</li>
         </ul>
@@ -147,7 +197,8 @@ function App() {
           <li>Navigate to <strong>Businesses</strong> to add your business information</li>
           <li>Validate your business with the Secretary of State</li>
           <li>Sync your information across all platforms</li>
-          <li>Browse <strong>Advertising Options</strong> to grow your business</li>
+          <li>Browse <strong>Facebook Ads</strong> or <strong>Google AdSense</strong> packages</li>
+          <li>Check out <strong>Combined Packages</strong> for complete solutions</li>
         </ol>
 
         <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f0f4ff', borderRadius: '8px' }}>
@@ -158,7 +209,7 @@ function App() {
               <div style={{ color: '#666' }}>Total Businesses</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5em', fontWeight: 'bold', color: '#667eea' }}>15+</div>
+              <div style={{ fontSize: '2.5em', fontWeight: 'bold', color: '#667eea' }}>30+</div>
               <div style={{ color: '#666' }}>Advertising Packages</div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -414,6 +465,195 @@ function App() {
     </>
   );
 
+  const renderFacebookPackages = () => (
+    <>
+      <div className="card">
+        <h2>👍 Facebook Marketing Packages</h2>
+        <p style={{ fontSize: '1.1em', color: '#666', marginBottom: '30px' }}>
+          Create Facebook pages and run targeted ad campaigns with full demographic and geographic targeting capabilities.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="card">Loading Facebook packages...</div>
+      ) : facebookPackages.length > 0 ? (
+        <div className="packages-grid">
+          {facebookPackages.map((provider, idx) => (
+            <div key={idx} className="provider-section">
+              <h3 style={{ color: '#1877f2', marginBottom: '20px' }}>
+                {provider.provider_name}
+              </h3>
+              <div className="packages-list">
+                {provider.packages.map((pkg, pkgIdx) => (
+                  <div key={pkgIdx} className="package-card facebook-package">
+                    <div className="package-header">
+                      <h4>{pkg.name}</h4>
+                      <div className="price">${pkg.price.toLocaleString()}/mo</div>
+                    </div>
+                    <div className="description">{pkg.description}</div>
+                    <div className="details">
+                      <div>📅 Duration: {pkg.duration_days} days</div>
+                      <div>🎯 Targeting: {pkg.features.demographic_targeting}</div>
+                      {pkg.features.geographic_radius && (
+                        <div>📍 Geographic Reach: {pkg.features.geographic_radius}</div>
+                      )}
+                      {pkg.features.geographic_targeting && (
+                        <div>🌍 Geographic: {pkg.features.geographic_targeting}</div>
+                      )}
+                      <div>👥 Estimated Reach: {(pkg.features.estimated_reach || 0).toLocaleString()}</div>
+                      <div>💵 Daily Budget: ${pkg.features.daily_budget}</div>
+                      {pkg.features.page_creation && <div>✅ Includes Facebook Page Creation</div>}
+                      {pkg.features.interest_targeting && <div>✅ Interest Targeting</div>}
+                      {pkg.features.behavior_targeting && <div>✅ Behavior Targeting</div>}
+                      {pkg.features.lookalike_audiences && <div>✅ Lookalike Audiences</div>}
+                      {pkg.features.custom_audiences && <div>✅ Custom Audiences</div>}
+                      {pkg.features.a_b_testing && <div>✅ A/B Testing</div>}
+                    </div>
+                    <div style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
+                      <strong>Ad Placements:</strong> {Array.isArray(pkg.features.ad_placements) 
+                        ? pkg.features.ad_placements.join(', ') 
+                        : pkg.features.ad_placements}
+                    </div>
+                    <button className="btn btn-facebook">Select Package</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+
+  const renderAdSensePackages = () => (
+    <>
+      <div className="card">
+        <h2>💰 Google AdSense Packages</h2>
+        <p style={{ fontSize: '1.1em', color: '#666', marginBottom: '30px' }}>
+          Setup and manage Google AdSense for website monetization with multiple ad formats and placement optimization.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="card">Loading AdSense packages...</div>
+      ) : adsensePackages.length > 0 ? (
+        <div className="packages-grid">
+          {adsensePackages.map((provider, idx) => (
+            <div key={idx} className="provider-section">
+              <h3 style={{ color: '#4285f4', marginBottom: '20px' }}>
+                {provider.provider_name}
+              </h3>
+              <div className="packages-list">
+                {provider.packages.map((pkg, pkgIdx) => (
+                  <div key={pkgIdx} className="package-card adsense-package">
+                    <div className="package-header">
+                      <h4>{pkg.name}</h4>
+                      <div className="price">${pkg.price.toLocaleString()}</div>
+                    </div>
+                    <div className="description">{pkg.description}</div>
+                    <div className="details">
+                      <div>📅 Duration: {pkg.duration_days} days</div>
+                      <div>📊 Ad Units: {pkg.features.ad_units}</div>
+                      <div>💰 Est. Monthly Revenue: ${pkg.features.estimated_monthly_revenue}</div>
+                      {pkg.features.account_setup && <div>✅ Account Setup Included</div>}
+                      {pkg.features.responsive_design && <div>✅ Responsive Design</div>}
+                      {pkg.features.placement_optimization && <div>✅ Placement Optimization</div>}
+                      {pkg.features.a_b_testing && <div>✅ A/B Testing</div>}
+                      {pkg.features.custom_ad_sizes && <div>✅ Custom Ad Sizes</div>}
+                      {pkg.features.auto_ads && <div>✅ Auto Ads</div>}
+                      {pkg.features.revenue_optimization && <div>✅ Revenue Optimization</div>}
+                    </div>
+                    <div style={{ fontSize: '0.9em', color: '#666', marginTop: '10px' }}>
+                      <strong>Ad Types:</strong> {Array.isArray(pkg.features.ad_types) 
+                        ? pkg.features.ad_types.join(', ') 
+                        : pkg.features.ad_types}
+                    </div>
+                    <div style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
+                      <strong>Support:</strong> {pkg.features.support_level}
+                    </div>
+                    <button className="btn btn-adsense">Select Package</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+
+  const renderCombinedPackages = () => (
+    <>
+      <div className="card">
+        <h2>🚀 Combined Advertising Packages</h2>
+        <p style={{ fontSize: '1.1em', color: '#666', marginBottom: '30px' }}>
+          Get the best of both worlds! Facebook Ads for customer acquisition combined with Google AdSense for website monetization - all managed through one unified platform.
+        </p>
+        <div style={{ backgroundColor: '#f0f4ff', padding: '15px', borderRadius: '8px', marginTop: '20px' }}>
+          <strong>💡 Why Choose Combined Packages?</strong>
+          <ul style={{ marginTop: '10px', lineHeight: '1.8' }}>
+            <li>Unified dashboard for all your advertising needs</li>
+            <li>Better pricing than purchasing separately</li>
+            <li>Comprehensive reporting across both platforms</li>
+            <li>Dedicated account management</li>
+            <li>ROI optimization across all channels</li>
+          </ul>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="card">Loading combined packages...</div>
+      ) : combinedPackages.length > 0 ? (
+        <div className="packages-grid">
+          {combinedPackages.map((provider, idx) => (
+            <div key={idx} className="provider-section">
+              <h3 style={{ color: '#7c3aed', marginBottom: '20px' }}>
+                {provider.provider_name}
+              </h3>
+              <div className="packages-list">
+                {provider.packages.map((pkg, pkgIdx) => (
+                  <div key={pkgIdx} className="package-card combined-package">
+                    <div className="package-header">
+                      <h4>{pkg.name}</h4>
+                      <div className="price">${pkg.price.toLocaleString()}</div>
+                    </div>
+                    <div className="description">{pkg.description}</div>
+                    <div className="details">
+                      <div>📅 Duration: {pkg.duration_days} days</div>
+                      <div style={{ fontWeight: 'bold', marginTop: '15px', color: '#1877f2' }}>Facebook Features:</div>
+                      {pkg.features.facebook_page && <div>✅ Facebook Page Creation</div>}
+                      <div>🎯 Ad Targeting: {pkg.features.facebook_ads}</div>
+                      <div>💵 FB Daily Budget: ${pkg.features.facebook_budget}</div>
+                      <div>👥 FB Reach: {(pkg.features.estimated_fb_reach || 0).toLocaleString()}</div>
+                      {pkg.features.custom_audiences && <div>✅ Custom Audiences</div>}
+                      {pkg.features.lookalike_audiences && <div>✅ Lookalike Audiences</div>}
+                      
+                      <div style={{ fontWeight: 'bold', marginTop: '15px', color: '#4285f4' }}>AdSense Features:</div>
+                      {pkg.features.adsense_setup && <div>✅ AdSense Setup</div>}
+                      <div>📊 Ad Units: {pkg.features.adsense_ad_units}</div>
+                      <div>💰 Est. AdSense Revenue: ${pkg.features.estimated_adsense_revenue}</div>
+                      
+                      <div style={{ fontWeight: 'bold', marginTop: '15px', color: '#7c3aed' }}>Platform Features:</div>
+                      {pkg.features.unified_dashboard && <div>✅ Unified Dashboard</div>}
+                      {pkg.features.monthly_reports && <div>✅ Monthly Reports</div>}
+                      {pkg.features.weekly_reports && <div>✅ Weekly Reports</div>}
+                      {pkg.features.daily_reports && <div>✅ Daily Reports</div>}
+                      {pkg.features.dedicated_support && <div>✅ Dedicated Support</div>}
+                      {pkg.features.dedicated_account_manager && <div>✅ Dedicated Account Manager</div>}
+                      {pkg.features.roi_optimization && <div>✅ ROI Optimization</div>}
+                      {pkg.features.competitor_analysis && <div>✅ Competitor Analysis</div>}
+                    </div>
+                    <button className="btn btn-combined">Select Package</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="container">
       <div className="header">
@@ -441,13 +681,34 @@ function App() {
           className={currentView === 'advertising' ? 'active' : ''}
           onClick={() => setCurrentView('advertising')}
         >
-          📢 Advertising Options
+          📢 Traditional Ads
+        </button>
+        <button
+          className={currentView === 'facebook' ? 'active' : ''}
+          onClick={() => setCurrentView('facebook')}
+        >
+          👍 Facebook Ads
+        </button>
+        <button
+          className={currentView === 'adsense' ? 'active' : ''}
+          onClick={() => setCurrentView('adsense')}
+        >
+          💰 Google AdSense
+        </button>
+        <button
+          className={currentView === 'combined' ? 'active' : ''}
+          onClick={() => setCurrentView('combined')}
+        >
+          🚀 Combined Packages
         </button>
       </div>
 
       {currentView === 'home' && renderHome()}
       {currentView === 'businesses' && renderBusinesses()}
       {currentView === 'advertising' && renderAdvertising()}
+      {currentView === 'facebook' && renderFacebookPackages()}
+      {currentView === 'adsense' && renderAdSensePackages()}
+      {currentView === 'combined' && renderCombinedPackages()}
     </div>
   );
 }

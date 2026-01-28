@@ -318,3 +318,43 @@ code {
     min-width: 100%;
   }
 }
+
+/* Facebook Package Styles */
+.facebook-package {
+  border-left: 4px solid #1877f2;
+}
+
+.btn-facebook {
+  background: linear-gradient(135deg, #1877f2 0%, #0d5dbb 100%);
+}
+
+.btn-facebook:hover {
+  background: linear-gradient(135deg, #0d5dbb 0%, #094785 100%);
+}
+
+/* AdSense Package Styles */
+.adsense-package {
+  border-left: 4px solid #4285f4;
+}
+
+.btn-adsense {
+  background: linear-gradient(135deg, #4285f4 0%, #356ac3 100%);
+}
+
+.btn-adsense:hover {
+  background: linear-gradient(135deg, #356ac3 0%, #2850a0 100%);
+}
+
+/* Combined Package Styles */
+.combined-package {
+  border-left: 4px solid #7c3aed;
+  background: linear-gradient(135deg, #ffffff 0%, #f9f7ff 100%);
+}
+
+.btn-combined {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+}
+
+.btn-combined:hover {
+  background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);
+}
