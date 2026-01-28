@@ -284,11 +284,20 @@ class AdvertisingService {
    * @returns {Promise<Object>} All advertising packages organized by type
    */
   async getAllAdvertisingOptions() {
+    const FacebookMarketingService = require('./facebookMarketingService');
+    const GoogleAdSenseService = require('./googleAdSenseService');
+    
+    const facebookService = new FacebookMarketingService();
+    const adsenseService = new GoogleAdSenseService();
+    
     const radio = await this.getRadioStationPackages();
     const digital = await this.getDigitalAdvertisingPackages();
     const print = await this.getPrintAdvertisingPackages();
     const events = await this.getEventAdvertisingPackages();
     const website = await this.getWebsitePackages();
+    const facebook = await facebookService.getFacebookAdPackages();
+    const adsense = await adsenseService.getGoogleAdSensePackages();
+    const combined = await adsenseService.getCombinedPackages();
 
     return {
       radio: radio,
@@ -296,16 +305,22 @@ class AdvertisingService {
       print: print,
       events: events,
       website: website,
+      facebook: facebook,
+      google_adsense: adsense,
+      combined: combined,
       summary: {
         total_packages: radio[0].packages.length + 
                        digital[0].packages.length + 
                        print[0].packages.length +
                        events[0].packages.length +
-                       website[0].packages.length,
-        types_available: ['radio', 'digital', 'print', 'events', 'website'],
+                       website[0].packages.length +
+                       facebook[0].packages.length +
+                       adsense[0].packages.length +
+                       combined[0].packages.length,
+        types_available: ['radio', 'digital', 'print', 'events', 'website', 'facebook_ads', 'google_adsense', 'combined'],
         price_range: {
           min: 199,
-          max: 5000
+          max: 7500
         }
       }
     };

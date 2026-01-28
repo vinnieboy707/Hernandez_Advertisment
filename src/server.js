@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const businessesRouter = require('./routes/businesses');
 const advertisingRouter = require('./routes/advertising');
+const facebookRouter = require('./routes/facebook');
+const googleAdSenseRouter = require('./routes/googleAdSense');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api/businesses', businessesRouter);
 app.use('/api/advertising', advertisingRouter);
+app.use('/api/facebook', facebookRouter);
+app.use('/api/google-adsense', googleAdSenseRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -69,11 +73,31 @@ app.get('/', (req, res) => {
         radioPackages: 'GET /api/advertising/radio',
         digitalPackages: 'GET /api/advertising/digital',
         printPackages: 'GET /api/advertising/print',
+        eventsPackages: 'GET /api/advertising/events',
+        websitePackages: 'GET /api/advertising/website',
         allOptions: 'GET /api/advertising/all',
         createPackage: 'POST /api/advertising/packages',
         subscribe: 'POST /api/advertising/subscribe',
         businessAdvertising: 'GET /api/advertising/business/:businessId',
         updateSubscription: 'PUT /api/advertising/subscription/:id'
+      },
+      facebook: {
+        packages: 'GET /api/facebook/packages',
+        createPage: 'POST /api/facebook/pages',
+        getPages: 'GET /api/facebook/pages/:business_id',
+        createCampaign: 'POST /api/facebook/campaigns',
+        getCampaigns: 'GET /api/facebook/campaigns/:business_id',
+        getCampaignInsights: 'GET /api/facebook/campaigns/:campaign_id/insights',
+        updateCampaignStatus: 'PUT /api/facebook/campaigns/:campaign_id/status'
+      },
+      googleAdSense: {
+        packages: 'GET /api/google-adsense/packages',
+        combinedPackages: 'GET /api/google-adsense/combined-packages',
+        createAccount: 'POST /api/google-adsense/accounts',
+        getAccount: 'GET /api/google-adsense/accounts/:business_id',
+        createAdUnit: 'POST /api/google-adsense/ad-units',
+        getAdUnits: 'GET /api/google-adsense/ad-units/:account_id',
+        getReport: 'GET /api/google-adsense/reports/:account_id'
       }
     },
     features: [
@@ -81,6 +105,10 @@ app.get('/', (req, res) => {
       'Multi-platform sync (Google, Yellow Pages)',
       'Business hours and holiday management',
       'Radio, digital, and print advertising packages',
+      'Facebook Page creation and Ads Manager integration',
+      'Google AdSense setup and management',
+      'Full demographic and geographic targeting',
+      'Combined Facebook + AdSense packages',
       'Real-time data (no mock data)',
       'Easy deployment with Docker'
     ]

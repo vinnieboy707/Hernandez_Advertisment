@@ -104,12 +104,90 @@ const initDatabase = async () => {
       )
     `);
 
+    // Facebook Pages table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS facebook_pages (
+        id SERIAL PRIMARY KEY,
+        business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+        facebook_page_id VARCHAR(255) UNIQUE NOT NULL,
+        page_name VARCHAR(255) NOT NULL,
+        page_access_token TEXT,
+        page_url TEXT,
+        category VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Facebook Campaigns table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS facebook_campaigns (
+        id SERIAL PRIMARY KEY,
+        business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+        facebook_page_id INTEGER REFERENCES facebook_pages(id),
+        campaign_id VARCHAR(255) UNIQUE NOT NULL,
+        campaign_name VARCHAR(255) NOT NULL,
+        objective VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'paused',
+        budget_amount DECIMAL(10, 2),
+        budget_type VARCHAR(50),
+        targeting JSONB,
+        start_date TIMESTAMP,
+        end_date TIMESTAMP,
+        impressions INTEGER DEFAULT 0,
+        reach INTEGER DEFAULT 0,
+        clicks INTEGER DEFAULT 0,
+        spend DECIMAL(10, 2) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Google AdSense Accounts table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS google_adsense_accounts (
+        id SERIAL PRIMARY KEY,
+        business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+        adsense_account_id VARCHAR(255) UNIQUE,
+        publisher_id VARCHAR(255),
+        website_url TEXT NOT NULL,
+        account_status VARCHAR(50) DEFAULT 'pending',
+        approval_date TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Google AdSense Ad Units table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS google_adsense_units (
+        id SERIAL PRIMARY KEY,
+        adsense_account_id INTEGER REFERENCES google_adsense_accounts(id) ON DELETE CASCADE,
+        ad_unit_id VARCHAR(255) UNIQUE NOT NULL,
+        ad_unit_name VARCHAR(255) NOT NULL,
+        ad_type VARCHAR(100),
+        ad_size VARCHAR(50),
+        ad_code TEXT,
+        status VARCHAR(50) DEFAULT 'active',
+        impressions INTEGER DEFAULT 0,
+        clicks INTEGER DEFAULT 0,
+        earnings DECIMAL(10, 2) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_businesses_sos_number ON businesses(sos_registration_number);
       CREATE INDEX IF NOT EXISTS idx_businesses_state ON businesses(state);
       CREATE INDEX IF NOT EXISTS idx_platform_sync_business ON platform_sync(business_id);
       CREATE INDEX IF NOT EXISTS idx_business_hours_business ON business_hours(business_id);
+      CREATE INDEX IF NOT EXISTS idx_facebook_pages_business ON facebook_pages(business_id);
+      CREATE INDEX IF NOT EXISTS idx_facebook_campaigns_business ON facebook_campaigns(business_id);
+      CREATE INDEX IF NOT EXISTS idx_adsense_accounts_business ON google_adsense_accounts(business_id);
+      CREATE INDEX IF NOT EXISTS idx_adsense_units_account ON google_adsense_units(adsense_account_id);
     `);
 
     await client.query('COMMIT');

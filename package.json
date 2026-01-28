@@ -20,7 +20,8 @@
     "axios": "^1.6.2",
     "cors": "^2.8.5",
     "helmet": "^7.1.0",
-    "express-rate-limit": "^7.1.5"
+    "express-rate-limit": "^7.1.5",
+    "googleapis": "^128.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
