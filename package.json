@@ -1,0 +1,29 @@
+{
+  "name": "hernandez-advertising-platform",
+  "version": "1.0.0",
+  "description": "Easy to deploy advertising platform with Secretary of State integration",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/db/init.js",
+    "seed": "node src/db/seed.js",
+    "build": "cd client && npm run build"
+  },
+  "keywords": ["advertising", "business", "platform"],
+  "author": "Hernandez Advertising",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "googleapis": "^128.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

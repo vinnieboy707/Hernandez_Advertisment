@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  # SECURITY NOTE: The default password 'change_this_password' is weak and should be
+  # changed before deployment. Use the setup.sh script which generates a random password,
+  # or set DB_PASSWORD in your .env file to a strong password.
+  db:
+    image: postgres:15-alpine
+    container_name: hernandez_ads_db
+    environment:
+      POSTGRES_DB: hernandez_ads
+      POSTGRES_USER: hernandez_user
+      # SECURITY WARNING: Change this password! Use setup.sh or set DB_PASSWORD in .env
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_this_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hernandez_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Server
+  # SECURITY NOTE: Database credentials are passed via environment variable.
+  # For production deployments, consider using Docker secrets or a secure vault.
+  api:
+    build: .
+    container_name: hernandez_ads_api
+    environment:
+      # SECURITY WARNING: Database password is visible in logs if not properly secured
+      DATABASE_URL: postgresql://hernandez_user:${DB_PASSWORD:-change_this_password}@db:5432/hernandez_ads
+      PORT: 3000
+      NODE_ENV: production
+      SOS_API_KEY: ${SOS_API_KEY}
+      SOS_STATE: ${SOS_STATE:-CA}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_BUSINESS_ACCOUNT_ID: ${GOOGLE_BUSINESS_ACCOUNT_ID}
+      YELLOWPAGES_API_KEY: ${YELLOWPAGES_API_KEY}
+      RADIO_API_KEY: ${RADIO_API_KEY}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Database initialization (runs once)
+  db-init:
+    build: .
+    container_name: hernandez_ads_db_init
+    environment:
+      DATABASE_URL: postgresql://hernandez_user:${DB_PASSWORD:-change_this_password}@db:5432/hernandez_ads
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npm run init-db && npm run seed"
+    restart: "no"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: hernandez_ads_network
